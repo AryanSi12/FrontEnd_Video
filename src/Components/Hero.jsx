@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { ApiError } from "../../../src/utils/ApiError";
+
 import axios from 'axios'
 import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
@@ -23,7 +23,8 @@ const Hero = () => {
         );
         setVideos(response.data.data.videos);
       } catch (error) {
-        throw new ApiError(400, "Failed to load videos");
+        console.log(error);
+        
       }
     };
     fetchVideos();
