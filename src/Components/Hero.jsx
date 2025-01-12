@@ -64,7 +64,7 @@ const Hero = () => {
             My Videos
           </button>
           <button
-            onClick={() => navigate("/playlists")}
+            onClick={() => navigate("/user-playlists")}
             className="w-full py-2 px-4 text-left hover:bg-gray-700 rounded-md"
           >
             My Playlists
@@ -79,7 +79,7 @@ const Hero = () => {
       </div>
 
       {/* Menu Button for Small Screens */}
-      <div className=" h-screen md:hidden fixed top-20 bottom-14 left-4 z-50">
+      <div className=" h-screen md:hidden absolute top-20 bottom-14 left-4 z-50">
   <button
     onClick={() => setMenuOpen(true)}
     className="bg-slate-800 p-2 rounded-md text-white"

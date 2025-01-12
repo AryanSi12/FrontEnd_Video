@@ -11,8 +11,22 @@ const Navbar = () => {
   const dispatch = useDispatch();
   const location = useLocation();
   const { userDetails, isLoggedIn } = useSelector((state) => state.user);
-
+  const [videos, setVideos] = useState([]);
+  const [sugg,setSugg] = useState([])
+  const [noResults,setNoResults]=useState(false)
   useEffect(() => {
+    const fetchVideos = async () => {
+      try {
+        const response = await axios.get("http://localhost:7000/api/v1/videos/video/random-videos?page=1&limit=100&sortBy=createdAt&sortType=1",
+          { withCredentials: true },
+        );
+        setVideos(response.data.data.videos);
+      } catch (error) {
+        console.log(error);
+        
+      }
+    };
+    fetchVideos();
     const validateToken = async () => {
       try {
         const response = await axios.get('http://localhost:7000/api/v1/users/current-user', {
@@ -30,7 +44,24 @@ const Navbar = () => {
     if (isLoggedIn) {
       validateToken();
     }
-  }, [dispatch, isLoggedIn]);
+  }, []);
+
+  const HandleChange = (e) =>{
+    const query=e.target.value;
+    console.log(videos);
+    if(videos.length > 0){
+      const suggestions = videos.filter(video => video.title.toLowerCase().includes(query.toLowerCase()))
+      setSugg(suggestions)
+    }
+    else{
+      setSuggestion([])
+    }
+    
+  }
+
+  const handleSubmit = () => {
+
+  }
 
   const handleLogout = async () => {
     try {
@@ -68,21 +99,48 @@ const Navbar = () => {
 
         {/* Desktop Menu */}
         <div className="hidden md:flex items-center w-1/2">
-          <div className="relative w-full">
-            <input
-              type="text"
-              placeholder="Search"
-              className="w-full px-4 py-2 pl-10 rounded-md bg-gray-800 text-gray-300 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-600"
-            />
-            <FiSearch
-              className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
-              size={20}
-            />
-          </div>
-          <button className="ml-2 px-4 py-2 bg-gray-700 rounded-md hover:bg-gray-600">
-            Search
-          </button>
-        </div>
+  <div className="relative w-full">
+    <input
+      type="text"
+      placeholder="Search"
+      onChange={HandleChange}
+      className="w-full px-4 py-2 pl-10 rounded-md bg-gray-800 text-gray-300 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-600"
+    />
+    <FiSearch
+      className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+      size={20}
+    />
+    {noResults && (
+      <p className="block text-xl mt-2 text-red-500 font-medium">
+        No Results Found!
+      </p>
+    )}
+    <div className="relative">
+      <ul className="absolute z-10 w-full mt-2 rounded-md bg-gray-900 shadow-lg max-h-60 overflow-y-auto">
+        {!noResults &&
+          sugg &&
+          sugg.map((suggest) => (
+            <li
+              key={suggest.title}
+              className="px-4 py-2 flex items-center text-gray-200 hover:bg-gray-700 hover:text-white transition-all duration-200 cursor-pointer"
+            >
+              <Link
+                to={`/video/${suggest._id}`}
+                className="flex items-center gap-2 w-full"
+              >
+                <span className="truncate">{suggest.title}</span>
+              </Link>
+            </li>
+          ))}
+      </ul>
+    </div>
+  </div>
+  <button
+  onChange={handleSubmit}
+  className="ml-2 px-4 py-2 bg-gray-700 rounded-md hover:bg-gray-600 transition-colors duration-300">
+    Search
+  </button>
+</div>
 
         <div className="hidden md:flex items-center">
           {isLoggedIn ? (
@@ -111,17 +169,46 @@ const Navbar = () => {
       {/* Mobile Menu */}
       {isMenuOpen && (
         <div className="md:hidden flex flex-col bg-slate-950 text-white px-6 pb-4">
+          <div className="md:hidden flex flex-col bg-slate-950 text-white px-6 pb-4">
           <div className="flex items-center gap-4 mt-4">
             <input
               type="text"
               placeholder="Search"
-              className="w-full px-4 py-2 rounded-md bg-gray-800 text-gray-300 placeholder-gray-500"
+              onChange={HandleChange}
+              className="w-full px-4 py-2 rounded-md bg-gray-800 text-gray-300 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-600"
             />
-            <button className="px-4 py-2 bg-gray-700 rounded-md hover:bg-gray-600">
+            <button
+            onChange={handleSubmit}
+            className="px-4 py-2 bg-gray-700 rounded-md hover:bg-gray-600 transition-all duration-300">
               Search
             </button>
           </div>
-          {isLoggedIn ? (
+          {noResults && (
+            <p className="mt-4 text-center text-lg font-medium text-red-500">
+              No Results Found!
+            </p>
+          )}
+          <div className="relative mt-2">
+            <ul className="absolute w-full mt-2 bg-gray-900 rounded-md shadow-lg max-h-60 overflow-y-auto z-10">
+              {!noResults &&
+                sugg &&
+                sugg.map((suggest) => (
+                  <li
+                    key={suggest.title}
+                    className="px-4 py-2 flex items-center text-gray-200 hover:bg-gray-700 hover:text-white transition-all duration-200 cursor-pointer"
+                  >
+                    <Link
+                      to={`/post/${suggest.$id}`}
+                      className="flex items-center gap-2 w-full"
+                    >
+                      <span className="truncate">{suggest.title}</span>
+                    </Link>
+                  </li>
+                ))}
+            </ul>
+          </div>
+        </div>
+        {isLoggedIn ? (
             <div className="mt-4">
               <ProfileMenu userDetails={userDetails} onLogout={handleLogout} />
             </div>

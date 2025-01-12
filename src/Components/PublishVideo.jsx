@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 const PublishVideo = () => {
@@ -7,7 +7,27 @@ const PublishVideo = () => {
   const [videoFile, setVideoFile] = useState(null);
   const [thumbnail, setThumbnail] = useState(null);
   const [isLoading, setIsLoading] = useState(false); // State for loading
+  const [user,setUser] = useState(null)
   const navigate = useNavigate()
+  useEffect(()=>{
+    try {
+      const fetchDetails = async () =>{
+        const response = await axios.get('http://localhost:7000/api/v1/users/current-user', {
+          withCredentials: true,
+        });
+        console.log(response);
+      
+      setUser(response.data.data)
+      }
+      
+      fetchDetails()
+    }
+    catch(err)
+    {
+      console.log(err);
+      
+    }
+  },[])
   const handlePublish = async (e) => {
     e.preventDefault();
 
@@ -41,6 +61,12 @@ const PublishVideo = () => {
     }
   };
 
+  if (!user)
+    return (
+      <p className="text-gray-400 text-xl font-semibold min-h-screen flex items-center justify-center">
+        Login to publish a video
+      </p>
+    );
   if (isLoading) {
     // Loading screen while publishing
     return (

@@ -18,6 +18,8 @@ import {store , persistor} from './Redux/userStore.jsx'
 
 import MyAccount from './Components/MyAccount.jsx'
 import LikedVideos from './Components/LikedVideos.jsx'
+import UserPlaylists from './Components/UserPlayists.jsx'
+import PlaylistVideos from './Components/PlaylistVideos.jsx'
 const router = createBrowserRouter([
   {
     path: "/",
@@ -62,12 +64,21 @@ const router = createBrowserRouter([
       {
         path : "/liked-videos",
         element : <LikedVideos />
+      },
+      {
+        path : "/user-playlists",
+        element : <UserPlaylists />
+      },
+      {
+        path : "/playlist-videos/:playlistId",
+        element : <PlaylistVideos />
       }
     ]
   }
 ])
 
 createRoot(document.getElementById('root')).render(
+
   <StrictMode>
   <Provider store={store}>
   <PersistGate loading={null} persistor={persistor}>
@@ -75,4 +86,5 @@ createRoot(document.getElementById('root')).render(
   </PersistGate>
   </Provider>
   </StrictMode>,
+
 )
