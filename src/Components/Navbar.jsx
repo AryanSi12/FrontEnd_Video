@@ -54,7 +54,7 @@ const Navbar = () => {
       setSugg(suggestions)
     }
     else{
-      setSuggestion([])
+      setSugg([])
     }
     
   }
