@@ -19,7 +19,7 @@ const MyAccount = () => {
     const fetchUserDetails = async () => {
       try {
         const response = await axios.get(
-          `http://localhost:7000/api/v1/users/channel/${username}`,
+          `https://backend-video-1.onrender.com/api/v1/users/channel/${username}`,
           {
             withCredentials: true,
           }

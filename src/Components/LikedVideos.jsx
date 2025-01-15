@@ -16,7 +16,7 @@ const LikedVideos = () => {
   useEffect(() => {
     const fetchLikedVideos = async () => {
       try {
-        const response = await axios.get("http://localhost:7000/api/v1/likes/get-liked-v", {
+        const response = await axios.get("https://backend-video-1.onrender.com/api/v1/likes/get-liked-v", {
           withCredentials: true,
         });
         console.log(response);

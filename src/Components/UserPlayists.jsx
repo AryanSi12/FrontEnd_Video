@@ -26,7 +26,7 @@ const UserPlaylists = () => {
     const fetchPlaylists = async () => {
       try {
         const response = await axios.get(
-          `http://localhost:7000/api/v1/playlist/user/${userDetails.id}`,
+          `https://backend-video-1.onrender.com/api/v1/playlist/user/${userDetails.id}`,
           { withCredentials: true }
         );
         

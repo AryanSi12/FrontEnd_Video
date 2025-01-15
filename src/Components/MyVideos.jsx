@@ -17,7 +17,7 @@ const MyVideos = () => {
     const fetchVideos = async () => {
       try {
         const response = await axios.get(
-          "http://localhost:7000/api/v1/videos/video/user-videos",
+          "https://backend-video-1.onrender.com/api/v1/videos/video/user-videos",
           {
             withCredentials: true, // Include credentials if needed
           }

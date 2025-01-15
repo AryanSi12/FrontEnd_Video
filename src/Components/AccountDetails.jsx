@@ -13,7 +13,7 @@ const AccountDetails = () => {
   useEffect(() => {
     const fetchUserDetails = async () => {
       try {
-        const response = await axios.get(`http://localhost:7000/api/v1/users/channel/${username}`, {
+        const response = await axios.get(`https://backend-video-1.onrender.com/api/v1/users/channel/${username}`, {
           withCredentials: true
         });
         console.log(response.data.data);
@@ -32,7 +32,7 @@ const AccountDetails = () => {
 
   const handleSubscribe = async () => {
     try{
-    const toggleSubscribe = await axios.get(`http://localhost:7000/api/v1/users/subscribe/${userDetails._id}`,{
+    const toggleSubscribe = await axios.get(`https://backend-video-1.onrender.com/api/v1/users/subscribe/${userDetails._id}`,{
       withCredentials: true,
     });
     console.log(toggleSubscribe);

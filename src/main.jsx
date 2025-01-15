@@ -20,6 +20,7 @@ import MyAccount from './Components/MyAccount.jsx'
 import LikedVideos from './Components/LikedVideos.jsx'
 import UserPlaylists from './Components/UserPlayists.jsx'
 import PlaylistVideos from './Components/PlaylistVideos.jsx'
+import SearchResults from './Components/SearchResults.jsx'
 const router = createBrowserRouter([
   {
     path: "/",
@@ -72,6 +73,10 @@ const router = createBrowserRouter([
       {
         path : "/playlist-videos/:playlistId",
         element : <PlaylistVideos />
+      },
+      {
+        path : "/search-results",
+        element : <SearchResults />
       }
     ]
   }

@@ -43,7 +43,7 @@ function SignUp() {
   
       // API call to register user
       const response = await axios.post(
-        'http://localhost:7000/api/v1/users/register',
+        'https://backend-video-1.onrender.com/api/v1/users/register',
         formData, 
         {
           headers: {
@@ -76,7 +76,7 @@ function SignUp() {
         username : data.userName,
         password : data.password
       }
-      const responselogin = await axios.post('http://localhost:7000/api/v1/users/login',loginData,{
+      const responselogin = await axios.post('https://backend-video-1.onrender.com/api/v1/users/login',loginData,{
         withCredentials : true,
       })
       navigate("/")

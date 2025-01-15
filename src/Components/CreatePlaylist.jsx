@@ -12,7 +12,7 @@ const CreatePlaylist = ({ onClose, onCreate }) => {
     
     try {
       const response = await axios.post(
-        'http://localhost:7000/api/v1/playlist/',
+        'https://backend-video-1.onrender.com/api/v1/playlist/',
         { name: data.playlistName, description: data.playlistDescription},
         { withCredentials: true }
       );

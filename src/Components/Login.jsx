@@ -21,7 +21,7 @@ function Login() {
     const manageLogin = async (data)=>{
         console.log(data);
         try{
-          const response = await axios.post('http://localhost:7000/api/v1/users/login',data,{
+          const response = await axios.post('https://backend-video-1.onrender.com/api/v1/users/login',data,{
             withCredentials : true,
           })
           console.log(response);

@@ -7,6 +7,7 @@ import { useDispatch, useSelector } from "react-redux";
 
 const VideoDetail = () => {
   const { id } = useParams(); // Get video ID from the URL
+  const [isDescriptionOpen, setIsDescriptionOpen] = useState(false);
   const [video, setVideo] = useState(null);
   const [suggestedVideos, setSuggested] = useState([]);
   const [likes, setLikes] = useState(0);
@@ -16,19 +17,25 @@ const VideoDetail = () => {
   const [playlists, setPlaylists] = useState([]); // List of existing playlists
   const [showPlaylistModal, setShowPlaylistModal] = useState(false); // Modal visibility
   const [newPlaylistName, setNewPlaylistName] = useState(""); // New playlist name
+  const [comments, setComments] = useState([]); // List of comments
+  const [newComment, setNewComment] = useState(""); // New comment input
+  const [replyingTo, setReplyingTo] = useState(null); // Tracks the comment being replied to
+  const [replyContent, setReplyContent] = useState(""); // Stores the reply content
   const navigate = useNavigate();
   const { userDetails, isLoggedIn } = useSelector((state) => state.user);
+  console.log(userDetails);
+  
   useEffect(() => {
     const fetchVideo = async () => {
       try {
         const response = await axios.get(
-          `http://localhost:7000/api/v1/videos/${id}`,
+          `https://backend-video-1.onrender.com/api/v1/videos/${id}`,
           {
             withCredentials: true,
           }
         );
         const suggVideos = await axios.get(
-          "http://localhost:7000/api/v1/videos/video/random-videos?page=1&limit=10&sortBy=createdAt&sortType=1",
+          "https://backend-video-1.onrender.com/api/v1/videos/video/random-videos?page=1&limit=10&sortBy=createdAt&sortType=1",
           { withCredentials: true }
         );
         setSuggested(suggVideos.data.data.videos);
@@ -40,35 +47,122 @@ const VideoDetail = () => {
         console.error("Error fetching video data:", error.message);
       }
     };
-
-
     const fetchPlaylists = async () => {
       try {
         const response = await axios.get(
-          `http://localhost:7000/api/v1/playlist/user/${userDetails.id}`,
+          `https://backend-video-1.onrender.com/api/v1/playlist/user/${userDetails.id}`,
           {
-              withCredentials: true, // Ensures cookies are sent with the request
+            withCredentials: true, // Ensures cookies are sent with the request
           }
-      );
-      
-        console.log(response);
-        
+        );
         setPlaylists(response.data.data);
       } catch (error) {
         console.error("Error fetching playlists:", error.message);
       }
     };
 
+    const fetchComments = async () => {
+      try {
+        const response = await axios.get(
+          `https://backend-video-1.onrender.com/api/v1/comment/${id}`,
+          { withCredentials: true }
+        );
+        console.log(response);
+        
+        
+        setComments(response.data.data || []);
+      } catch (error) {
+        console.error("Error fetching comments:", error.message);
+      }
+    };
+
     fetchVideo();
     fetchPlaylists();
+    fetchComments();
   }, [id]);
 
   if (!video) return <div className="text-center text-white">Loading...</div>;
 
+  const handleReplyClick = (commentId) => {
+    setReplyingTo(commentId === replyingTo ? null : commentId); // Toggle reply input visibility
+  };
+
+  const handleReplySubmit = async (parentId,content) => {
+    try {
+      const response = await axios.post(
+        `https://backend-video-1.onrender.com/api/v1/comment/addReply/${id}/${parentId}`,
+        {
+          content : content,
+        },
+        { withCredentials: true }
+      );
+      
+      setComments(response.data.data || []);
+    } catch (error) {
+      console.error("Error fetching comments:", error.message);
+    }
+  }
+
+  const handleReplySubmitLocal = (parentCommentId) => {
+    if (!replyContent.trim()) return;
+    handleReplySubmit(parentCommentId, replyContent); // Pass reply to parent component
+    setReplyContent("");
+    setReplyingTo(null);
+  };
+
+  const handleCommentSubmit = async () => {
+    if (!newComment.trim()) return; // Prevent empty comments
+    try {
+      const response = await axios.post(
+        `https://backend-video-1.onrender.com/api/v1/comment/${id}`,
+        { content : newComment },
+        { withCredentials: true }
+      );
+      setComments([...comments, response.data.data]); // Update comments list
+      setNewComment(""); // Clear the input
+    } catch (error) {
+      console.error("Error adding comment:", error.message);
+    }
+  };
+
+  const handleAddToPlaylist = async (playlistId) => {
+    try {
+      const response = await axios.patch(
+        `https://backend-video-1.onrender.com/api/v1/playlist/add/${video[0]._id}/${playlistId}`,
+        {},
+        { withCredentials: true }
+      );
+      alert(response.data.message || "Video added to playlist successfully!");
+      setShowPlaylistModal(false);
+    } catch (error) {
+      console.error("Error adding video to playlist:", error.message);
+    }
+  };
+
+
+
+  const handleCreatePlaylist = async () => {
+    try {
+      const response = await axios.post(
+        "https://backend-video-1.onrender.com/api/v1/playlists/create",
+        { name: newPlaylistName },
+        { withCredentials: true }
+      );
+      setPlaylists([...playlists, response.data.data]); // Update playlists state
+      setShowPlaylistModal(false); // Close the modal
+      setNewPlaylistName(""); // Reset the input
+      alert("Playlist created successfully!");
+    } catch (error) {
+      console.error("Error creating playlist:", error.message);
+    }
+  };
+
+  
+  
   const handleLike = async () => {
     try {
       const response = await axios.post(
-        `http://localhost:7000/api/v1/likes/toggle/v/${video[0]._id}`,
+        `https://backend-video-1.onrender.com/api/v1/likes/toggle/v/${video[0]._id}`,
         null,
         { withCredentials: true }
       );
@@ -87,7 +181,7 @@ const VideoDetail = () => {
   const handleSubscribe = async () => {
     try {
       const toggleSubscribe = await axios.get(
-        `http://localhost:7000/api/v1/users/subscribe/${video[0].uploadedBy._id}`,
+        `https://backend-video-1.onrender.com/api/v1/users/subscribe/${video[0].uploadedBy._id}`,
         {
           withCredentials: true,
         }
@@ -99,37 +193,6 @@ const VideoDetail = () => {
       console.error("Error in subscribing:", error.message);
     }
   };
-
-  const handleAddToPlaylist = async (playlistId) => {
-    try {
-      const response = await axios.patch(
-        `http://localhost:7000/api/v1/playlist/add/${video[0]._id}/${playlistId}`,
-        {},
-        { withCredentials: true }
-      );
-      alert(response.data.message || "Video added to playlist successfully!");
-      setShowPlaylistModal(false);
-    } catch (error) {
-      console.error("Error adding video to playlist:", error.message);
-    }
-  };
-
-  const handleCreatePlaylist = async () => {
-    try {
-      const response = await axios.post(
-        "http://localhost:7000/api/v1/playlists/create",
-        { name: newPlaylistName },
-        { withCredentials: true }
-      );
-      setPlaylists([...playlists, response.data.data]); // Update playlists state
-      setShowPlaylistModal(false); // Close the modal
-      setNewPlaylistName(""); // Reset the input
-      alert("Playlist created successfully!");
-    } catch (error) {
-      console.error("Error creating playlist:", error.message);
-    }
-  };
-
 
   return (
     <div className="flex flex-col lg:flex-row p-4 bg-gray-900 text-white min-h-screen">
@@ -177,7 +240,7 @@ const VideoDetail = () => {
           <p>Views: {video[0].views || 0}</p>
         </div>
 
-        {/* Like, Dislike, Subscribe, Add to Playlist */}
+        {/* Like, Subscribe */}
         <div className="flex items-center space-x-4 mt-4">
           <button
             className={`px-4 py-2 rounded-lg flex items-center ${
@@ -188,10 +251,8 @@ const VideoDetail = () => {
             <FaHeart className="mr-2 text-2xl" /> {likes}
           </button>
           <button
-            className={`px-4 py-2 rounded-lg flex items-center ${
-              isSubscribed
-                ? "bg-gray-600"
-                : "bg-red-500 hover:bg-red-600"
+            className={`px-4 py-2 rounded-lg ${
+              isSubscribed ? "bg-gray-600" : "bg-red-500 hover:bg-red-600"
             }`}
             onClick={handleSubscribe}
           >
@@ -204,16 +265,144 @@ const VideoDetail = () => {
             Add to Playlist
           </button>
         </div>
-
         {/* Description */}
-        <div className="mt-6">
-          <h2 className="text-lg font-semibold mb-2">Description</h2>
-          <p className="text-gray-300">
+      <div className="mt-6">
+        <h2
+          className="text-lg font-semibold mb-2 cursor-pointer"
+          onClick={() => setIsDescriptionOpen(!isDescriptionOpen)}
+        >
+          {isDescriptionOpen ? "Hide Description" : "Show Description"}
+        </h2>
+        {isDescriptionOpen && (
+          <p className="text-gray-300 bg-gray-800 p-3 rounded-lg">
             {video[0].description || "No description available."}
           </p>
-        </div>
+        )}
       </div>
 
+      {/* Comments Section */}
+      <div className="mt-6">
+        <h2 className="text-lg font-semibold mb-4">
+          {comments.length} Comments
+        </h2>
+
+        {/* Add Comment */}
+        <div className="flex items-center space-x-4 mb-6">
+          <img
+            src={userDetails.avatar} // Replace with actual user avatar path
+            alt="User Avatar"
+            className="w-10 h-10 rounded-full"
+          />
+          <div className="flex-1">
+            <input
+              type="text"
+              placeholder="Add a comment..."
+              value={newComment}
+              onChange={(e) => setNewComment(e.target.value)}
+              className="w-full p-2 bg-gray-700 text-white rounded-lg outline-none"
+            />
+          </div>
+          <button
+            className="px-4 py-2 bg-blue-500 rounded-lg hover:bg-blue-600 text-white"
+            onClick={handleCommentSubmit}
+          >
+            Comment
+          </button>
+        </div>
+
+        {/* Sort Comments */}
+        <div className="flex items-center justify-between mb-4">
+          <p className="text-gray-400">{comments.length} Comments</p>
+          <select className="bg-gray-800 text-gray-300 p-2 rounded-lg outline-none">
+            <option value="top">Top Comments</option>
+            <option value="newest">Newest First</option>
+          </select>
+        </div>
+
+        {/* Comments List */}
+        <div className="bg-gray-900 text-white p-4 rounded-md space-y-6">
+      {comments && comments.map((comment) => (
+        <div key={comment._id} className="mb-8">
+          {/* Parent Comment */}
+          <div className="flex items-start gap-4">
+            <img
+              src={comment.owner.avatar || "https://via.placeholder.com/50"}
+              alt="Avatar"
+              className="w-12 h-12 rounded-full"
+            />
+            <div className="flex-1">
+              <div className="flex items-center gap-2">
+                <span className="font-semibold text-lg">
+                  {comment.owner.username || "Unknown"}
+                </span>
+                <span className="text-gray-500 text-sm">
+                  {new Date(comment.createdAt).toLocaleDateString()}
+                </span>
+              </div>
+              <p className="mt-2 text-gray-300">{comment.content}</p>
+
+              {/* Reply Button */}
+              <button
+                onClick={() => handleReplyClick(comment._id)}
+                className="mt-2 text-sm text-blue-500 hover:underline focus:outline-none"
+              >
+                Reply
+              </button>
+
+              {/* Reply Input */}
+              {replyingTo === comment._id && (
+                <div className="mt-4">
+                  <textarea
+                    value={replyContent}
+                    onChange={(e) => setReplyContent(e.target.value)}
+                    placeholder="Write your reply..."
+                    className="w-full p-2 bg-gray-800 text-white rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                  <div className="flex justify-end mt-2">
+                    <button
+                      onClick={() => handleReplySubmitLocal(comment._id)}
+                      className="px-4 py-2 bg-blue-500 hover:bg-blue-600 rounded-md text-white"
+                    >
+                      Submit Reply
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Replies for the Parent Comment */}
+          {comment.replies
+            .filter((reply) => reply.parentComment === comment._id) // Match replies with their parent comment
+            .map((reply) => (
+              <div
+                key={reply._id}
+                className="mt-4 ml-10 border-l-2 border-gray-700 pl-4"
+              >
+                <div className="flex items-start gap-4 mb-4">
+                  <img
+                    src={reply.owner.avatar} // Placeholder avatar
+                    alt="Reply Avatar"
+                    className="w-10 h-10 rounded-full"
+                  />
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <span className="font-semibold">{reply.owner.username}</span>{" "}
+                      {/* Replace with actual owner */}
+                      <span className="text-gray-500 text-sm">
+                        {new Date(reply.createdAt).toLocaleDateString()}
+                      </span>
+                    </div>
+                    <p className="mt-1">{reply.content}</p>
+                  </div>
+                </div>
+              </div>
+            ))}
+        </div>
+      ))}
+    </div>
+      </div>
+          </div>
       {/* Suggested Videos */}
       <div className="w-full lg:w-1/4 p-4 bg-gray-800 rounded-lg shadow-lg ml-0 lg:ml-4 mt-4 lg:mt-0">
         <h2 className="text-lg font-semibold mb-4">Up Next</h2>
@@ -247,9 +436,8 @@ const VideoDetail = () => {
           </div>
         ))}
       </div>
-
-      {/* Playlist Modal */}
-      {showPlaylistModal && (
+       {/* Playlist Modal */}
+       {showPlaylistModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-gray-800 p-6 rounded-lg shadow-lg text-white w-96">
             <h2 className="text-lg font-semibold mb-4">Add to Playlist</h2>

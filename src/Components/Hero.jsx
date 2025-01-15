@@ -18,7 +18,7 @@ const Hero = () => {
   useEffect(() => {
     const fetchVideos = async () => {
       try {
-        const response = await axios.get("http://localhost:7000/api/v1/videos/video/random-videos?page=1&limit=100&sortBy=createdAt&sortType=1",
+        const response = await axios.get("https://backend-video-1.onrender.com/api/v1/videos/video/random-videos?page=1&limit=100&sortBy=createdAt&sortType=1",
           { withCredentials: true },
         );
         setVideos(response.data.data.videos);

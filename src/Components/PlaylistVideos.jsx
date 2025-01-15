@@ -17,7 +17,7 @@ const PlaylistVideos = () => {
 
       try {
         const response = await axios.get(
-          `http://localhost:7000/api/v1/playlist/getvideos/${playlistId}`,
+          `https://backend-video-1.onrender.com/api/v1/playlist/getvideos/${playlistId}`,
           { withCredentials: true }
         );
         console.log(response.data.data[0].videoDetails);
@@ -49,7 +49,7 @@ const PlaylistVideos = () => {
 
     try {
       await axios.patch(
-        `http://localhost:7000/api/v1/playlist/remove/${selectedVideo._id}/${playlistId}`,
+        `https://backend-video-1.onrender.com/api/v1/playlist/remove/${selectedVideo._id}/${playlistId}`,
         {},
         { withCredentials: true }  
       );

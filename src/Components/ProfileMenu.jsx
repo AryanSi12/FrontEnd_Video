@@ -4,9 +4,6 @@ import { Link } from "react-router-dom";
 const ProfileMenu = ({ userDetails, onLogout }) => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     console.log(userDetails);
-    
-    console.log(userDetails);
-    
     const toggleMenu = () => {
         console.log(5);
         

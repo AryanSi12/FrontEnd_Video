@@ -12,7 +12,7 @@ const PublishVideo = () => {
   useEffect(()=>{
     try {
       const fetchDetails = async () =>{
-        const response = await axios.get('http://localhost:7000/api/v1/users/current-user', {
+        const response = await axios.get('https://backend-video-1.onrender.com/api/v1/users/current-user', {
           withCredentials: true,
         });
         console.log(response);
@@ -35,7 +35,6 @@ const PublishVideo = () => {
       alert("Please fill out all fields!");
       return;
     }
-
     const formData = new FormData();
     formData.append("title", title);
     formData.append("description", description);
@@ -45,8 +44,10 @@ const PublishVideo = () => {
     setIsLoading(true); // Set loading state to true
 
     try {
+      
+      
       const response = await axios.post(
-        "http://localhost:7000/api/v1/videos/video",
+        "https://backend-video-1.onrender.com/api/v1/videos/video",
         formData,
         { headers: { "Content-Type": "multipart/form-data" }, withCredentials: true }
       );
@@ -70,7 +71,7 @@ const PublishVideo = () => {
   if (isLoading) {
     // Loading screen while publishing
     return (
-      <div className="flex items-center justify-center min-h-screen bg-gray-900 text-white">
+      <div className="flex items-center justify-center min-h-screen bg-slate-950 text-white">
         <div className="text-center">
           <div className="loader border-t-4 border-b-4 border-blue-500 w-16 h-16 rounded-full animate-spin mb-4"></div>
           <p className="text-lg font-semibold">Publishing your video, please wait...</p>
@@ -80,7 +81,7 @@ const PublishVideo = () => {
   }
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-900 text-white p-4">
+    <div className="flex flex-col items-center justify-center min-h-screen bg-slate-950 text-white p-4">
       <div className="w-full max-w-lg bg-gray-800 p-6 rounded-lg shadow-lg">
         <h1 className="text-2xl font-bold mb-6">Publish Your Video (max img size : 10 Mb and Video Size : 100 Mb)</h1>
         <form onSubmit={handlePublish} className="space-y-4">

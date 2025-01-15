@@ -13,7 +13,7 @@ const SubscribedChannels = () => {
     const fetchChannels = async () => {
       try {
         const response = await axios.get(
-          `http://localhost:7000/api/v1/users/getChannels/${userDetails.id}`,
+          `https://backend-video-1.onrender.com/api/v1/users/getChannels/${userDetails.id}`,
           { withCredentials: true }
         );
         if (response.data.data.length > 0) setChannels(response.data.data);

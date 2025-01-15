@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { FiSearch, FiLogIn, FiUserPlus, FiMenu, FiX } from "react-icons/fi";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation,useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import ProfileMenu from './ProfileMenu';
 import axios from 'axios';
@@ -14,10 +14,12 @@ const Navbar = () => {
   const [videos, setVideos] = useState([]);
   const [sugg,setSugg] = useState([])
   const [noResults,setNoResults]=useState(false)
+  const [searchText, setSearchText] = useState('');
+  const navigate = useNavigate()
   useEffect(() => {
     const fetchVideos = async () => {
       try {
-        const response = await axios.get("http://localhost:7000/api/v1/videos/video/random-videos?page=1&limit=100&sortBy=createdAt&sortType=1",
+        const response = await axios.get("https://backend-video-1.onrender.com/api/v1/videos/video/random-videos?page=1&limit=100&sortBy=createdAt&sortType=1",
           { withCredentials: true },
         );
         setVideos(response.data.data.videos);
@@ -29,7 +31,7 @@ const Navbar = () => {
     fetchVideos();
     const validateToken = async () => {
       try {
-        const response = await axios.get('http://localhost:7000/api/v1/users/current-user', {
+        const response = await axios.get('https://backend-video-1.onrender.com/api/v1/users/current-user', {
           withCredentials: true,
         });
         if (response) {
@@ -48,8 +50,9 @@ const Navbar = () => {
 
   const HandleChange = (e) =>{
     const query=e.target.value;
-    console.log(videos);
-    if(videos.length > 0){
+    setSearchText(query);
+    if(!query)setSugg([])
+    else if(videos.length > 0){
       const suggestions = videos.filter(video => video.title.toLowerCase().includes(query.toLowerCase()))
       setSugg(suggestions)
     }
@@ -59,16 +62,24 @@ const Navbar = () => {
     
   }
 
-  const handleSubmit = () => {
+  const clearSearchOnNavigate = () => {
+    setSearchText('');
+    setSugg([]);
+  };
 
+  const handleSubmit = () => {
+    const vid = sugg
+    clearSearchOnNavigate()    
+    navigate("/search-results", { state: { suggestions: vid } }); 
   }
 
   const handleLogout = async () => {
     try {
-      const response = await axios.post('http://localhost:7000/api/v1/users/logout', null, {
+      const response = await axios.post('https://backend-video-1.onrender.com/api/v1/users/logout', null, {
         withCredentials: true,
       });
       dispatch(clearUserDetails());
+      navigate("/")
     } catch (error) {
       console.error("Error in logging out:", error.message);
     }
@@ -103,6 +114,7 @@ const Navbar = () => {
     <input
       type="text"
       placeholder="Search"
+      value={searchText}
       onChange={HandleChange}
       className="w-full px-4 py-2 pl-10 rounded-md bg-gray-800 text-gray-300 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-600"
     />
@@ -126,6 +138,7 @@ const Navbar = () => {
             >
               <Link
                 to={`/video/${suggest._id}`}
+                onClick={clearSearchOnNavigate} 
                 className="flex items-center gap-2 w-full"
               >
                 <span className="truncate">{suggest.title}</span>
@@ -136,7 +149,7 @@ const Navbar = () => {
     </div>
   </div>
   <button
-  onChange={handleSubmit}
+  onClick={handleSubmit}
   className="ml-2 px-4 py-2 bg-gray-700 rounded-md hover:bg-gray-600 transition-colors duration-300">
     Search
   </button>
@@ -173,16 +186,17 @@ const Navbar = () => {
           <div className="flex items-center gap-4 mt-4">
             <input
               type="text"
+              value={searchText}
               placeholder="Search"
               onChange={HandleChange}
               className="w-full px-4 py-2 rounded-md bg-gray-800 text-gray-300 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-600"
             />
             <button
-            onChange={handleSubmit}
+            onClick={handleSubmit}
             className="px-4 py-2 bg-gray-700 rounded-md hover:bg-gray-600 transition-all duration-300">
               Search
             </button>
-          </div>
+          </div> 
           {noResults && (
             <p className="mt-4 text-center text-lg font-medium text-red-500">
               No Results Found!
@@ -198,7 +212,8 @@ const Navbar = () => {
                     className="px-4 py-2 flex items-center text-gray-200 hover:bg-gray-700 hover:text-white transition-all duration-200 cursor-pointer"
                   >
                     <Link
-                      to={`/post/${suggest.$id}`}
+                      to={`/video/${suggest._id}`}
+                      onClick={clearSearchOnNavigate} 
                       className="flex items-center gap-2 w-full"
                     >
                       <span className="truncate">{suggest.title}</span>
@@ -208,7 +223,7 @@ const Navbar = () => {
             </ul>
           </div>
         </div>
-        {isLoggedIn ? (
+        {isLoggedIn ? (   
             <div className="mt-4">
               <ProfileMenu userDetails={userDetails} onLogout={handleLogout} />
             </div>
