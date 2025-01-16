@@ -26,10 +26,7 @@ function SignUp() {
       console.log("Form data submitted:", data);
   
       // Ensure reCAPTCHA token is present
-      if (!captchaToken) {
-        console.error("Please complete the reCAPTCHA challenge.");
-        return;
-      }
+    
   
       // Prepare form data for backend
       const formData = new FormData();
@@ -260,11 +257,7 @@ function SignUp() {
                   {coverImage && <p className="text-gray-400 text-sm">{coverImage.name}</p>}
                 </div>
 
-                {/* reCAPTCHA */}
-                <div className="pb-4 pt-3 flex items-center justify-center">
-                  <ReCAPTCHA sitekey="6LfZ2lIqAAAAACwrrNDbFJ9VFyzV2jQ8Z604HZEj" onChange={onChange} />
-                </div>
-
+               
                 {/* Submit Button */}
                 <button
                   type="submit"
