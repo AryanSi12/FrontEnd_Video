@@ -3,12 +3,33 @@ import React, { useEffect, useState } from "react";
 import axios from 'axios'
 import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
-
+import { clearUserDetails } from "../Redux/userSlice";
+import { useDispatch, useSelector } from "react-redux";
 const Hero = () => {
   const navigate = useNavigate();
   const [videos, setVideos] = useState([]);
   const [menuOpen, setMenuOpen] = useState(false);
+  const dispatch = useDispatch()
+  const { userDetails, isLoggedIn } = useSelector((state) => state.user);
+  useEffect(()=>{
+    const validateToken = async () => {
+      try {
+        const response = await axios.get('https://backend-video-1.onrender.com/api/v1/users/current-user', {
+          withCredentials: true,
+        });
+        if (response) {
+        } else {
+          dispatch(clearUserDetails());
+        }
+      } catch (error) {
+        dispatch(clearUserDetails());
+      }
+    };
 
+    if (isLoggedIn) {
+      validateToken();
+    }
+  },[])
   const formatDuration = (duration) => {
     const minutes = Math.floor(duration / 60);
     const seconds = Math.floor(duration % 60).toString().padStart(2, "0");
@@ -91,7 +112,7 @@ const Hero = () => {
 
       {/* Video Gallery */}
       <div className="w-full bg  p-4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 overflow-y-auto mt-12">
-  {videos.map((video) => (
+  {isLoggedIn && videos.map((video) => (
     <div
       key={video._id}
       className="rounded-md bg-gray-950 shadow-md hover:scale-105 transform transition-all duration-300 cursor-pointer"

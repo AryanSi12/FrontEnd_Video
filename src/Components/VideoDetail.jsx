@@ -67,7 +67,7 @@ const VideoDetail = () => {
           `https://backend-video-1.onrender.com/api/v1/comment/${id}`,
           { withCredentials: true }
         );
-        console.log(response);
+        console.log(response.data.data);
         
         
         setComments(response.data.data || []);
@@ -96,8 +96,12 @@ const VideoDetail = () => {
         },
         { withCredentials: true }
       );
+      const comments = await axios.get(
+        `https://backend-video-1.onrender.com/api/v1/comment/${id}`,
+        { withCredentials: true }
+      );
       
-      setComments(response.data.data || []);
+      setComments(comments.data.data || []); // Update comments list
     } catch (error) {
       console.error("Error fetching comments:", error.message);
     }
@@ -118,7 +122,12 @@ const VideoDetail = () => {
         { content : newComment },
         { withCredentials: true }
       );
-      setComments([...comments, response.data.data]); // Update comments list
+      const comments = await axios.get(
+        `https://backend-video-1.onrender.com/api/v1/comment/${id}`,
+        { withCredentials: true }
+      );
+      
+      setComments(comments.data.data || []); // Update comments list
       setNewComment(""); // Clear the input
     } catch (error) {
       console.error("Error adding comment:", error.message);
