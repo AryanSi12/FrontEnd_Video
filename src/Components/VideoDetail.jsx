@@ -4,10 +4,11 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { FaHeart } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
-
+import { useForm } from "react-hook-form";
 const VideoDetail = () => {
   const { id } = useParams(); // Get video ID from the URL
   const [isDescriptionOpen, setIsDescriptionOpen] = useState(false);
+  const { register, handleSubmit, formState: { errors } } = useForm();
   const [video, setVideo] = useState(null);
   const [suggestedVideos, setSuggested] = useState([]);
   const [likes, setLikes] = useState(0);
@@ -150,15 +151,18 @@ const VideoDetail = () => {
 
 
 
-  const handleCreatePlaylist = async () => {
+  const handleCreatePlaylist = async (data) => {
     try {
       const response = await axios.post(
-        "https://backend-video-1.onrender.com/api/v1/playlists/create",
-        { name: newPlaylistName },
+        'https://backend-video-1.onrender.com/api/v1/playlist/',
+        { name: data.playlistName, description: data.description},
         { withCredentials: true }
       );
+      console.log(response.data.data);
+      
       setPlaylists([...playlists, response.data.data]); // Update playlists state
       setShowPlaylistModal(false); // Close the modal
+      handleAddToPlaylist(response.data.data._id)
       setNewPlaylistName(""); // Reset the input
       alert("Playlist created successfully!");
     } catch (error) {
@@ -459,22 +463,39 @@ const VideoDetail = () => {
                 {playlist.name}
               </button>
             ))}
+            <div className="text-center p-3">OR</div>
             <div className="mt-4">
-              <input
-                type="text"
-                placeholder="New Playlist Name"
-                value={newPlaylistName}
-                onChange={(e) => setNewPlaylistName(e.target.value)}
-                className="w-full p-2 bg-gray-700 rounded mb-2"
-              />
-              <button
-                className="w-full px-4 py-2 bg-green-500 rounded hover:bg-green-600"
-                onClick={handleCreatePlaylist}
-              >
-                Create Playlist
-              </button>
-            </div>
-            <button
+      <form onSubmit={handleSubmit(handleCreatePlaylist)}>
+        <div className="mb-4">
+          <input
+            type="text"
+            placeholder="Playlist Name"
+            {...register("playlistName", { required: "Playlist name is required" })}
+            className="w-full p-2 bg-gray-700 rounded mb-2"
+          />
+          {errors.playlistName && (
+            <p className="text-red-500 text-sm">{errors.playlistName.message}</p>
+          )}
+        </div>
+        <div className="mb-4">
+          <textarea
+            placeholder="Description"
+            {...register("description", { required: "Description is required" })}
+            className="w-full p-2 bg-gray-700 rounded mb-2"
+          />
+          {errors.description && (
+            <p className="text-red-500 text-sm">{errors.description.message}</p>
+          )}
+        </div>
+        <button
+          type="submit"
+          className="w-full px-4 py-2 bg-green-500 rounded hover:bg-green-600"
+        >
+          Create Playlist
+        </button>
+      </form>
+    </div>
+    <button
               className="w-full px-4 py-2 mt-4 bg-red-500 rounded hover:bg-red-600"
               onClick={() => setShowPlaylistModal(false)}
             >
