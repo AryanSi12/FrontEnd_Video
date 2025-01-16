@@ -138,13 +138,13 @@ const Hero = () => {
   ) : (
     <div className="sm:hidden flex flex-col items-center justify-center h-64 bg-gray-800 rounded-md text-center shadow-md">
   <p className="text-lg font-semibold text-gray-300 mb-4">
-    Please log in to view the videos.
+    Please sign in to view the videos.
   </p>
   <button
-    onClick={() => navigate("/login")}
+    onClick={() => navigate("/signup")}
     className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-500 transition-all duration-300"
   >
-    Go to Login
+    Click to register
   </button>
 </div>
 
