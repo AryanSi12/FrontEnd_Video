@@ -40,8 +40,8 @@ function SignUp() {
   
       // API call to register user
       const response = await axios.post(
-        'https://backend-video-1.onrender.com/api/v1/users/register',
-        formData, 
+        'https://backend-video-1.onrender.com/api/v1/users/register',  
+        formData,   
         {
           headers: {
             'Content-Type': 'multipart/form-data', // Required for FormData
