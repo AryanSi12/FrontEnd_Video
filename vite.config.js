@@ -6,7 +6,7 @@ export default defineConfig({
   server: {
     proxy: {
       "/api": {
-        target: "http://localhost:7000", // Backend server
+        target: "https://backend-video-1.onrender.com", // Backend server
         changeOrigin: true,
       },
     },
